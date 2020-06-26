@@ -24,3 +24,5 @@ class HhvSpider(scrapy.Spider):
                     'label': v.css('div.format_label::text').getall(),
                     'release': v.css('div.release>span.value::text').getall()
                 }
+
+# some prices fail, when record is on sale
