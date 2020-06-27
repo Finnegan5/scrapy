@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.utils.response import open_in_browser
+import re
 
 class HhvSpider(scrapy.Spider):
-    pages = int(input('How many pages do you want to scrape: '))
     name = 'hhv'
     allowed_domains = ['www.hhv.de']
-    start_urls = ['https://www.hhv.de/shop/en/vinyl/p:125B9G?&page={}'.format(i + 1) for i in range(pages)]
+    start_urls = ['https://www.hhv.de/shop/en/vinyl/p:125B9G']
     custom_settings = {
         'ITEM_PIPELINES': {
             'rushhour.pipelines.HhvPipeline': 300,
@@ -25,4 +25,12 @@ class HhvSpider(scrapy.Spider):
                     'release': v.css('div.release>span.value::text').getall()
                 }
 
-# some prices fail, when record is on sale
+        max_pages = re.search('\d{3}$', response.css('div.status::text').get(), re.IGNORECASE)
+        max_pages = int(max_pages.group(0))
+        current_page = re.search('\ \d*\ ', response.css('div.status::text').get(), re.IGNORECASE)
+        current_page = int(current_page.group(0))
+
+        next_page = 'https://www.hhv.de/shop/en/vinyl/p:125B9G' + '?&page=' + str(current_page + 1)
+        if not (current_page + 1) > max_pages:
+            yield scrapy.Request(next_page, callback=self.parse)
+
