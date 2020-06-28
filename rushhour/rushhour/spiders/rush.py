@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import json
-from scrapy.utils.response import open_in_browser
 
 class RushSpider(scrapy.Spider):
-    pages = int(input('How many pages do you want to scrapeeeeee: '))
     name = 'rush'
-    download_delay = 10.0
     allowed_domains = ['rushhour.nl']
-    start_urls = ['https://www.rushhour.nl/search?instock=&page={}'.format(i) for i in range(pages)]
+    start_urls = ['https://www.rushhour.nl/search?instock']
     custom_settings = {
         'ITEM_PIPELINES': {
             'rushhour.pipelines.RushhourPipeline': 400,
@@ -26,3 +23,6 @@ class RushSpider(scrapy.Spider):
                     "label": v.css('div.field-name-field-label::text').getall(),
                     "release": v.css('div.field-name-field-release-week::text').getall()
                 }
+        next_page = response.css('a[title="Go to next page"]::attr(href)').get()
+        if next_page is not None:
+            yield response.follow(next_page, callback=self.parse)
