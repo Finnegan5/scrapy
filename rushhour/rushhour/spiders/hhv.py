@@ -17,13 +17,22 @@ class HhvSpider(scrapy.Spider):
         vinyls = response.css('div.items')
         for vinyl in vinyls:
             for v in vinyl.css('div.item_list_entry'):
-                yield {
-                    'artist': v.css('div.artist::text').getall(),
-                    'title': v.css('div.title::text').getall(),
-                    'price': v.css('div.price::text').getall(),
-                    'label': v.css('div.format_label::text').getall(),
-                    'release': v.css('div.release>span.value::text').getall()
-                }
+                if not v.css('div.sale'):
+                    yield {
+                        'artist': v.css('div.artist::text').getall(),
+                        'title': v.css('div.title::text').getall(),
+                        'price': v.css('div.price::text').getall(),
+                        'label': v.css('div.format_label::text').getall(),
+                        'release': v.css('div.release>span.value::text').getall()
+                    }
+                else:
+                    yield {
+                        'artist': v.css('div.artist::text').getall(),
+                        'title': v.css('div.title::text').getall(),
+                        'price': v.css('div.price>span.new::text').getall(),
+                        'label': v.css('div.format_label::text').getall(),
+                        'release': v.css('div.release>span.value::text').getall()
+                    }
 
         max_pages = re.search('\d{3}$', response.css('div.status::text').get(), re.IGNORECASE)
         max_pages = int(max_pages.group(0))
