@@ -18,6 +18,10 @@ class HhvPipeline:
             item['release'] = release_search.group(0)
             item['created_at'] = datetime.now()
             item['updated_at'] = datetime.now()
+        if item['price']:
+            price_search = re.search('\d*\,\d\d', str(item['price']), re.IGNORECASE)
+            item['price'] = price_search.group(0).replace(',', '.')
+
         return item
 
 class RushhourPipeline:
