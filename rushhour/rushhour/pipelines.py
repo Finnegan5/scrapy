@@ -21,7 +21,7 @@ class HhvPipeline:
     def open_spider(self, spider):
         token = os.environ.get("TOKEN")
 
-        url = 'http://127.0.0.1:3000/api/v1/db_url'
+        url = 'https://www.thegoodygoody.com/api/v1/db_url'
         headers = {'token': token}
         r = requests.get(url, headers=headers)
         url = json.loads(r.text)['database_url']
@@ -71,6 +71,28 @@ class HhvPipeline:
         self.connection.close()
 
 class RushhourPipeline:
+    def open_spider(self, spider):
+        token = os.environ.get("TOKEN")
+
+        url = 'https://www.thegoodygoody.com/api/v1/db_url'
+        headers = {'token': token}
+        r = requests.get(url, headers=headers)
+        url = json.loads(r.text)['database_url']
+
+        result = urlparse(url)
+        username = result.username
+        password = result.password
+        database = result.path[1:]
+        hostname = result.hostname
+
+        self.connection = psycopg2.connect(
+            database=database,
+            user=username,
+            password=password,
+            host=hostname
+        )
+        self.cursor = self.connection.cursor()
+
     def process_item(self, item, spider):
         if not item['artist']:
             raise DropItem("Missing artist in %s" % item)
@@ -79,4 +101,15 @@ class RushhourPipeline:
             item['release'] = release_search.group(0)
             item['created_at'] = datetime.now()
             item['updated_at'] = datetime.now()
+        sql = '''
+            INSERT INTO rushhour_records ("artist", "title", "price", "label", "release", "created_at", "updated_at")
+            VALUES(%s, %s, %s, %s, %s, %s, %s)
+        '''
+        self.cursor.execute(sql, (item["artist"], item["title"], item["price"],
+                                  item["label"], item["release"], item["created_at"], item["updated_at"]))
+        self.connection.commit()
         return item
+
+    def close_spider(self, spider):
+        self.cursor.close()
+        self.connection.close()

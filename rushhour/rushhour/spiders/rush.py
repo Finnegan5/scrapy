@@ -58,8 +58,6 @@ class RushSpider(scrapy.Spider):
                     "release": release
                 }
 
-
-
         next_page = response.request.meta['next']
         if next_page is not None:
             yield response.follow(next_page, callback=self.parse)
