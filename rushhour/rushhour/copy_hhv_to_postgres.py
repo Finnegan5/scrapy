@@ -1,4 +1,5 @@
 import psycopg2
+from urllib.parse import urlparse
 
 connection = psycopg2.connect(user="ngdtmjgwzsnfjz",
                               password="b5a3543cbd153c8b7af3943b27d28010d127d6c7b1a9c863e773ae8932cbe8b5",
