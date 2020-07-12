@@ -31,6 +31,7 @@ openssl=1.1.1g=h0b31af3_0
 parsel=1.6.0=py_0
 pip=20.1.1=py_1
 protego=0.1.16=py_0
+psycopg2=2.8.5=pypi_0
 pyasn1=0.4.8=py_0
 pyasn1-modules=0.2.7=py_0
 pycodestyle=2.6.0=pyh9f0ad1d_0
