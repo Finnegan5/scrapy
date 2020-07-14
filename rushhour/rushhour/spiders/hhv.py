@@ -34,9 +34,9 @@ class HhvSpider(scrapy.Spider):
                         'release': v.css('div.release>span.value::text').getall()
                     }
 
-        max_pages = re.search('\d{3}$', response.css('div.status::text').get(), re.IGNORECASE)
+        max_pages = re.search(r'\d{3}$', response.css('div.status::text').get(), re.IGNORECASE)
         max_pages = int(max_pages.group(0))
-        current_page = re.search('\ \d*\ ', response.css('div.status::text').get(), re.IGNORECASE)
+        current_page = re.search(r'\ \d*\ ', response.css('div.status::text').get(), re.IGNORECASE)
         current_page = int(current_page.group(0))
 
         next_page = 'https://www.hhv.de/shop/en/vinyl/p:125B9G' + '?&page=' + str(current_page + 1)
